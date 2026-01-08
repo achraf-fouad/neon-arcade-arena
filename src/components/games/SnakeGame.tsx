@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
 
 interface SnakeGameProps {
   isPlaying: boolean;
@@ -14,14 +15,24 @@ const INITIAL_SPEED = 150;
 type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
 type Position = { x: number; y: number };
 
-const SnakeGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: SnakeGameProps) => {
+const SnakeGame = ({
+  isPlaying,
+  isPaused,
+  onScoreChange,
+  onGameOver,
+}: SnakeGameProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const gameLoopRef = useRef<number>();
+  const directionRef = useRef<Direction>("RIGHT");
+
   const [snake, setSnake] = useState<Position[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Position>({ x: 15, y: 15 });
   const [direction, setDirection] = useState<Direction>("RIGHT");
   const [score, setScore] = useState(0);
-  const directionRef = useRef<Direction>("RIGHT");
-  const gameLoopRef = useRef<number>();
+
+  /* ======================
+     HELPERS
+  ====================== */
 
   const generateFood = useCallback((snakeBody: Position[]): Position => {
     let newFood: Position;
@@ -30,7 +41,11 @@ const SnakeGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: SnakeGame
         x: Math.floor(Math.random() * GRID_SIZE),
         y: Math.floor(Math.random() * GRID_SIZE),
       };
-    } while (snakeBody.some((segment) => segment.x === newFood.x && segment.y === newFood.y));
+    } while (
+      snakeBody.some(
+        (segment) => segment.x === newFood.x && segment.y === newFood.y
+      )
+    );
     return newFood;
   }, []);
 
@@ -44,88 +59,102 @@ const SnakeGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: SnakeGame
     onScoreChange(0);
   }, [generateFood, onScoreChange]);
 
-  useEffect(() => {
-    if (!isPlaying) {
-      resetGame();
+  const changeDirection = useCallback((newDirection: Direction) => {
+    const current = directionRef.current;
+
+    const isOpposite =
+      (current === "UP" && newDirection === "DOWN") ||
+      (current === "DOWN" && newDirection === "UP") ||
+      (current === "LEFT" && newDirection === "RIGHT") ||
+      (current === "RIGHT" && newDirection === "LEFT");
+
+    if (!isOpposite) {
+      directionRef.current = newDirection;
+      setDirection(newDirection);
     }
+  }, []);
+
+  /* ======================
+     GAME STATE
+  ====================== */
+
+  useEffect(() => {
+    if (!isPlaying) resetGame();
   }, [isPlaying, resetGame]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isPlaying || isPaused) return;
 
-      const currentDir = directionRef.current;
-      let newDirection: Direction | null = null;
-
       switch (e.key) {
         case "ArrowUp":
-          if (currentDir !== "DOWN") newDirection = "UP";
+          e.preventDefault();
+          changeDirection("UP");
           break;
         case "ArrowDown":
-          if (currentDir !== "UP") newDirection = "DOWN";
+          e.preventDefault();
+          changeDirection("DOWN");
           break;
         case "ArrowLeft":
-          if (currentDir !== "RIGHT") newDirection = "LEFT";
+          e.preventDefault();
+          changeDirection("LEFT");
           break;
         case "ArrowRight":
-          if (currentDir !== "LEFT") newDirection = "RIGHT";
+          e.preventDefault();
+          changeDirection("RIGHT");
           break;
-      }
-
-      if (newDirection) {
-        e.preventDefault();
-        directionRef.current = newDirection;
-        setDirection(newDirection);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isPlaying, isPaused]);
+  }, [isPlaying, isPaused, changeDirection]);
 
   useEffect(() => {
     if (!isPlaying || isPaused) {
-      if (gameLoopRef.current) {
-        clearInterval(gameLoopRef.current);
-      }
+      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
       return;
     }
 
     const moveSnake = () => {
-      setSnake((prevSnake) => {
-        const head = { ...prevSnake[0] };
-        const currentDirection = directionRef.current;
+      setSnake((prev) => {
+        const head = { ...prev[0] };
 
-        switch (currentDirection) {
+        switch (directionRef.current) {
           case "UP":
-            head.y -= 1;
+            head.y--;
             break;
           case "DOWN":
-            head.y += 1;
+            head.y++;
             break;
           case "LEFT":
-            head.x -= 1;
+            head.x--;
             break;
           case "RIGHT":
-            head.x += 1;
+            head.x++;
             break;
         }
 
-        // Check wall collision
-        if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+        // Wall collision
+        if (
+          head.x < 0 ||
+          head.y < 0 ||
+          head.x >= GRID_SIZE ||
+          head.y >= GRID_SIZE
+        ) {
           onGameOver();
-          return prevSnake;
+          return prev;
         }
 
-        // Check self collision
-        if (prevSnake.some((segment) => segment.x === head.x && segment.y === head.y)) {
+        // Self collision
+        if (prev.some((s) => s.x === head.x && s.y === head.y)) {
           onGameOver();
-          return prevSnake;
+          return prev;
         }
 
-        const newSnake = [head, ...prevSnake];
+        const newSnake = [head, ...prev];
 
-        // Check food collision
+        // Food collision
         if (head.x === food.x && head.y === food.y) {
           const newScore = score + 10;
           setScore(newScore);
@@ -140,14 +169,21 @@ const SnakeGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: SnakeGame
     };
 
     gameLoopRef.current = window.setInterval(moveSnake, INITIAL_SPEED);
-    return () => {
-      if (gameLoopRef.current) {
-        clearInterval(gameLoopRef.current);
-      }
-    };
-  }, [isPlaying, isPaused, food, score, onScoreChange, onGameOver, generateFood]);
+    return () => clearInterval(gameLoopRef.current);
+  }, [
+    isPlaying,
+    isPaused,
+    food,
+    score,
+    generateFood,
+    onGameOver,
+    onScoreChange,
+  ]);
 
-  // Draw game
+  /* ======================
+     DRAW
+  ====================== */
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -155,11 +191,10 @@ const SnakeGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: SnakeGame
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Clear canvas
     ctx.fillStyle = "hsl(240, 20%, 6%)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw grid
+    // Grid
     ctx.strokeStyle = "hsl(240, 20%, 12%)";
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= GRID_SIZE; i++) {
@@ -173,12 +208,11 @@ const SnakeGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: SnakeGame
       ctx.stroke();
     }
 
-    // Draw snake
+    // Snake
     snake.forEach((segment, index) => {
-      const isHead = index === 0;
-      ctx.fillStyle = isHead ? "hsl(185, 100%, 50%)" : "hsl(185, 100%, 40%)";
-      ctx.shadowColor = "hsl(185, 100%, 50%)";
-      ctx.shadowBlur = isHead ? 15 : 10;
+      ctx.fillStyle = index === 0 ? "hsl(185,100%,50%)" : "hsl(185,100%,40%)";
+      ctx.shadowColor = "hsl(185,100%,50%)";
+      ctx.shadowBlur = index === 0 ? 15 : 10;
       ctx.fillRect(
         segment.x * CELL_SIZE + 1,
         segment.y * CELL_SIZE + 1,
@@ -187,9 +221,9 @@ const SnakeGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: SnakeGame
       );
     });
 
-    // Draw food
-    ctx.fillStyle = "hsl(300, 100%, 50%)";
-    ctx.shadowColor = "hsl(300, 100%, 50%)";
+    // Food
+    ctx.fillStyle = "hsl(300,100%,50%)";
+    ctx.shadowColor = "hsl(300,100%,50%)";
     ctx.shadowBlur = 15;
     ctx.beginPath();
     ctx.arc(
@@ -204,17 +238,41 @@ const SnakeGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: SnakeGame
     ctx.shadowBlur = 0;
   }, [snake, food]);
 
+  /* ======================
+     UI
+  ====================== */
+
   return (
     <div className="flex flex-col items-center gap-4">
       <canvas
         ref={canvasRef}
         width={GRID_SIZE * CELL_SIZE}
         height={GRID_SIZE * CELL_SIZE}
-        className="rounded-lg border border-border neon-border-cyan"
+        className="rounded-lg border neon-border-cyan"
       />
-      <div className="text-center text-sm text-muted-foreground font-gaming">
-        Use <span className="text-primary">ARROW KEYS</span> to move
+
+      {/* Mobile Controls */}
+      <div className="flex flex-col items-center gap-2 md:hidden">
+        <button onClick={() => changeDirection("UP")}>
+          <ArrowUp className="bg-black rounded-lg neon-border-cyan w-10"/>
+        </button>
+
+        <div className="flex gap-2">
+          <button onClick={() => changeDirection("LEFT")}>
+            <ArrowLeft className="bg-black rounded-lg neon-border-cyan w-10"/>
+          </button>
+          <button onClick={() => changeDirection("DOWN")}>
+            <ArrowDown className="bg-black rounded-lg neon-border-cyan w-10"/>
+          </button>
+          <button onClick={() => changeDirection("RIGHT")}>
+            <ArrowRight className="bg-black rounded-lg neon-border-cyan w-10"/>
+          </button>
+        </div>
       </div>
+
+      <p className="text-sm text-muted-foreground font-gaming">
+        Use <span className="text-primary">ARROW KEYS</span> or buttons
+      </p>
     </div>
   );
 };

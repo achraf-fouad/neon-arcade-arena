@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
+import { ArrowUp, ArrowDown} from "lucide-react";
 
 interface PongGameProps {
   isPlaying: boolean;
@@ -16,8 +17,15 @@ const PADDLE_SPEED = 8;
 const BALL_SPEED = 5;
 const WIN_SCORE = 10;
 
-const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGameProps) => {
+const PongGame = ({
+  isPlaying,
+  isPaused,
+  onScoreChange,
+  onGameOver,
+}: PongGameProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>();
+
   const gameRef = useRef({
     paddle1Y: CANVAS_HEIGHT / 2 - PADDLE_HEIGHT / 2,
     paddle2Y: CANVAS_HEIGHT / 2 - PADDLE_HEIGHT / 2,
@@ -29,13 +37,17 @@ const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGamePr
     score2: 0,
     keys: {} as Record<string, boolean>,
   });
-  const animationRef = useRef<number>();
+
+  /* ======================
+     HELPERS
+  ====================== */
 
   const resetBall = useCallback((direction: number) => {
-    gameRef.current.ballX = CANVAS_WIDTH / 2;
-    gameRef.current.ballY = CANVAS_HEIGHT / 2;
-    gameRef.current.ballVX = BALL_SPEED * direction;
-    gameRef.current.ballVY = (Math.random() - 0.5) * BALL_SPEED;
+    const game = gameRef.current;
+    game.ballX = CANVAS_WIDTH / 2;
+    game.ballY = CANVAS_HEIGHT / 2;
+    game.ballVX = BALL_SPEED * direction;
+    game.ballVY = (Math.random() - 0.5) * BALL_SPEED;
   }, []);
 
   const resetGame = useCallback(() => {
@@ -53,10 +65,12 @@ const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGamePr
     onScoreChange(0, 0);
   }, [onScoreChange]);
 
+  /* ======================
+     GAME STATE
+  ====================== */
+
   useEffect(() => {
-    if (!isPlaying) {
-      resetGame();
-    }
+    if (!isPlaying) resetGame();
   }, [isPlaying, resetGame]);
 
   useEffect(() => {
@@ -81,9 +95,7 @@ const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGamePr
 
   useEffect(() => {
     if (!isPlaying || isPaused) {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
       return;
     }
 
@@ -95,7 +107,7 @@ const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGamePr
     const gameLoop = () => {
       const game = gameRef.current;
 
-      // Handle paddle movement
+      // Paddle movement
       if (game.keys["w"] && game.paddle1Y > 0) {
         game.paddle1Y -= PADDLE_SPEED;
       }
@@ -109,38 +121,37 @@ const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGamePr
         game.paddle2Y += PADDLE_SPEED;
       }
 
-      // Move ball
+      // Ball movement
       game.ballX += game.ballVX;
       game.ballY += game.ballVY;
 
-      // Top/bottom collision
+      // Wall collision
       if (game.ballY <= 0 || game.ballY >= CANVAS_HEIGHT - BALL_SIZE) {
         game.ballVY *= -1;
       }
 
-      // Paddle 1 collision
+      // Paddle collisions
       if (
         game.ballX <= PADDLE_WIDTH + 20 &&
         game.ballY + BALL_SIZE >= game.paddle1Y &&
         game.ballY <= game.paddle1Y + PADDLE_HEIGHT
       ) {
         game.ballVX = Math.abs(game.ballVX) * 1.05;
-        const hitPos = (game.ballY - game.paddle1Y) / PADDLE_HEIGHT - 0.5;
-        game.ballVY = hitPos * BALL_SPEED * 2;
+        const hit = (game.ballY - game.paddle1Y) / PADDLE_HEIGHT - 0.5;
+        game.ballVY = hit * BALL_SPEED * 2;
       }
 
-      // Paddle 2 collision
       if (
         game.ballX >= CANVAS_WIDTH - PADDLE_WIDTH - 20 - BALL_SIZE &&
         game.ballY + BALL_SIZE >= game.paddle2Y &&
         game.ballY <= game.paddle2Y + PADDLE_HEIGHT
       ) {
         game.ballVX = -Math.abs(game.ballVX) * 1.05;
-        const hitPos = (game.ballY - game.paddle2Y) / PADDLE_HEIGHT - 0.5;
-        game.ballVY = hitPos * BALL_SPEED * 2;
+        const hit = (game.ballY - game.paddle2Y) / PADDLE_HEIGHT - 0.5;
+        game.ballVY = hit * BALL_SPEED * 2;
       }
 
-      // Score
+      // Scoring
       if (game.ballX < 0) {
         game.score2++;
         onScoreChange(game.score1, game.score2);
@@ -150,6 +161,7 @@ const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGamePr
         }
         resetBall(1);
       }
+
       if (game.ballX > CANVAS_WIDTH) {
         game.score1++;
         onScoreChange(game.score1, game.score2);
@@ -164,46 +176,56 @@ const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGamePr
       ctx.fillStyle = "hsl(240, 20%, 6%)";
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-      // Center line
       ctx.setLineDash([10, 10]);
       ctx.strokeStyle = "hsl(240, 20%, 20%)";
-      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(CANVAS_WIDTH / 2, 0);
       ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Paddles
-      ctx.fillStyle = "hsl(185, 100%, 50%)";
-      ctx.shadowColor = "hsl(185, 100%, 50%)";
+      ctx.fillStyle = "hsl(185,100%,50%)";
+      ctx.shadowColor = "hsl(185,100%,50%)";
       ctx.shadowBlur = 15;
       ctx.fillRect(20, game.paddle1Y, PADDLE_WIDTH, PADDLE_HEIGHT);
 
-      ctx.fillStyle = "hsl(300, 100%, 50%)";
-      ctx.shadowColor = "hsl(300, 100%, 50%)";
-      ctx.fillRect(CANVAS_WIDTH - 20 - PADDLE_WIDTH, game.paddle2Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+      ctx.fillStyle = "hsl(300,100%,50%)";
+      ctx.shadowColor = "hsl(300,100%,50%)";
+      ctx.fillRect(
+        CANVAS_WIDTH - 20 - PADDLE_WIDTH,
+        game.paddle2Y,
+        PADDLE_WIDTH,
+        PADDLE_HEIGHT
+      );
 
-      // Ball
-      ctx.fillStyle = "hsl(155, 100%, 50%)";
-      ctx.shadowColor = "hsl(155, 100%, 50%)";
+      ctx.fillStyle = "hsl(155,100%,50%)";
+      ctx.shadowColor = "hsl(155,100%,50%)";
       ctx.shadowBlur = 20;
       ctx.beginPath();
-      ctx.arc(game.ballX + BALL_SIZE / 2, game.ballY + BALL_SIZE / 2, BALL_SIZE / 2, 0, Math.PI * 2);
+      ctx.arc(
+        game.ballX + BALL_SIZE / 2,
+        game.ballY + BALL_SIZE / 2,
+        BALL_SIZE / 2,
+        0,
+        Math.PI * 2
+      );
       ctx.fill();
-
       ctx.shadowBlur = 0;
 
       animationRef.current = requestAnimationFrame(gameLoop);
     };
 
     animationRef.current = requestAnimationFrame(gameLoop);
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
+    return () => cancelAnimationFrame(animationRef.current);
   }, [isPlaying, isPaused, onScoreChange, onGameOver, resetBall]);
+
+  /* ======================
+     UI
+  ====================== */
+
+  const pressKey = (key: string, pressed: boolean) => {
+    gameRef.current.keys[key] = pressed;
+  };
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -211,16 +233,53 @@ const PongGame = ({ isPlaying, isPaused, onScoreChange, onGameOver }: PongGamePr
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
-        className="rounded-lg border border-border max-w-full"
-        style={{ maxWidth: "100%", height: "auto" }}
+        className="rounded-lg border max-w-full"
       />
-      <div className="flex justify-center gap-8 text-sm text-muted-foreground font-gaming">
-        <span>
-          <span className="text-primary">P1:</span> W / S
-        </span>
-        <span>
-          <span className="text-accent">P2:</span> ↑ / ↓
-        </span>
+
+      {/* Mobile Controls */}
+      <div className="flex justify-between w-full max-w-md md:hidden">
+        {/* Player 1 */}
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs text-primary">P1</span>
+          <button
+            onTouchStart={() => pressKey("w", true)}
+            onTouchEnd={() => pressKey("w", false)}
+            className="w-12 h-12 rounded-full bg-primary/20 neon-border-cyan"
+          >
+            <ArrowUp className="text-primary mx-auto"/>
+          </button>
+          <button
+            onTouchStart={() => pressKey("s", true)}
+            onTouchEnd={() => pressKey("s", false)}
+            className="w-12 h-12 rounded-full bg-primary/20 neon-border-cyan"
+          >
+            <ArrowDown className="text-primary mx-auto"/>
+          </button>
+        </div>
+
+        {/* Player 2 */}
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs text-accent">P2</span>
+          <button
+            onTouchStart={() => pressKey("ArrowUp", true)}
+            onTouchEnd={() => pressKey("ArrowUp", false)}
+            className="w-12 h-12 rounded-full bg-accent/20 neon-border-magenta"
+          >
+            <ArrowUp className="text-accent mx-auto"/>
+          </button>
+          <button
+            onTouchStart={() => pressKey("ArrowDown", true)}
+            onTouchEnd={() => pressKey("ArrowDown", false)}
+            className="w-12 h-12 rounded-full bg-accent/20 neon-border-magenta"
+          >
+            <ArrowDown className="text-accent mx-auto"/>
+          </button>
+        </div>
+      </div>
+
+      <div className="text-sm text-muted-foreground font-gaming">
+        P1: <span className="text-primary">W / S</span> — P2:{" "}
+        <span className="text-accent">↑ / ↓</span>
       </div>
     </div>
   );

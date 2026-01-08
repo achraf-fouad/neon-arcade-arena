@@ -66,7 +66,7 @@ const Header = () => {
                             </div>
                             <span className="font-gaming text-lg md:text-xl tracking-wider">
                                 <span className="text-primary animate-neon-flicker">NEON</span>
-                                <span className="text-foreground"> PLAYGROUND</span>
+                                <span className="text-foreground"> Games</span>
                             </span>
                         </Link>
 
