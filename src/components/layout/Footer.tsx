@@ -16,7 +16,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-muted-foreground text-sm">
-              Your ultimate destination for quick, fun, and competitive mini-games. 
+              Your ultimate destination for quick, fun, and competitive mini-games.
               Play solo or challenge a friend!
             </p>
           </div>
@@ -65,7 +65,24 @@ const Footer = () => {
           </p>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse" />
-            All systems operational
+            Created by
+            <a
+              href="https://achraf-fouad-portfolio.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline transition-colors hover:text-neon-green"
+            >
+              Achraf Fouaad
+            </a>
+            and
+            <a
+              href="https://abderrahmanboukssim.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline transition-colors hover:text-neon-cyan"
+            >
+              Abderrahman Boukssim
+            </a>
           </div>
         </div>
       </div>
