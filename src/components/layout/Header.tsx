@@ -71,7 +71,7 @@ const Header = () => {
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <nav className="hidden md:flex items-center gap-8">
+                        <nav className="hidden md:flex items-center gap-8 mr-32">
                             {navLinks.map((link) => {
                                 const active = location.pathname === link.href;
 
