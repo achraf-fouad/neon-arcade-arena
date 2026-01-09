@@ -68,7 +68,7 @@ const Footer = () => {
               href="https://achraf-fouad-portfolio.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline transition-colors hover:text-neon-green"
+              className="underline text-green-500 transition-colors hover:text-neon-green"
             >
               Achraf Fouaad
             </a>
@@ -77,7 +77,7 @@ const Footer = () => {
               href="https://abderrahmanboukssim.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline transition-colors hover:text-neon-cyan"
+              className="underline text-cyan-500 transition-colors hover:text-neon-cyan"
             >
               Abderrahman Boukssim
             </a>
