@@ -172,11 +172,11 @@ const ReactionGame = ({ isPlaying, onScoreChange, onGameOver }: ReactionGameProp
       {/* Main Signal Area */}
       <div
         className={cn(
-          "w-full aspect-video rounded-xl flex items-center justify-center transition-all duration-300",
+          "h-full w-[360px] rounded-xl flex items-center justify-center transition-all duration-300",
           "border-2",
           getStateColor(),
           gameState === "ready" && "border-destructive animate-pulse",
-          gameState === "go" && "border-neon-green neon-border-cyan",
+          gameState === "go" && "border-neon-green neon-border-cyan ",
           gameState === "result" && (tooEarly ? "border-destructive" : "border-primary")
         )}
       >
