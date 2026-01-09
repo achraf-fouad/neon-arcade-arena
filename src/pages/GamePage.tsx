@@ -137,7 +137,7 @@ const GamePage = () => {
   const showModeSelector = game.mode === "both";
 
   return (
-    <Layout showFooter={false}>
+    <Layout showFooter={false} >
       <section className="py-6 md:py-8 min-h-[calc(100vh-5rem)] " id="gameP">
         <div className="container mx-auto px-4 max-w-4xl ">
           {/* Mode Selector */}

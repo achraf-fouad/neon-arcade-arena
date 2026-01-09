@@ -48,31 +48,21 @@ const GameHUD = ({
                 <Home className="w-4 h-4" />
               </NeonButton>
             </Link>
-            <h1 className="font-gaming text-xl md:text-2xl text-primary">{title}</h1>
+            <h1 className="font-gaming text-xl md:text-2xl text-primary">
+              {title}
+            </h1>
           </div>
 
           {/* Timer if applicable */}
           {timer !== undefined && (
             <div className="font-gaming text-2xl text-foreground">
-              {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, "0")}
+              {Math.floor(timer / 60)}:
+              {(timer % 60).toString().padStart(2, "0")}
             </div>
           )}
 
-          {/* Controls */}
-          <div className="flex items-center gap-2">
-            {!isPlaying || isPaused ? (
-              <NeonButton variant="primary" size="sm" onClick={onPlay}>
-                <Play className="w-4 h-4 mr-1" /> PLAY
-              </NeonButton>
-            ) : (
-              <NeonButton variant="ghost" size="sm" onClick={onPause}>
-                <Pause className="w-4 h-4 mr-1" /> PAUSE
-              </NeonButton>
-            )}
-            <NeonButton variant="ghost" size="sm" onClick={onRestart}>
-              <RotateCcw className="w-4 h-4" />
-            </NeonButton>
-          </div>
+          
+          
         </div>
       </div>
 
@@ -81,23 +71,52 @@ const GameHUD = ({
         <div className="flex items-center justify-center gap-8">
           {mode === "solo" ? (
             <div className="text-center">
-              <div className="text-sm text-muted-foreground font-gaming mb-1">SCORE</div>
-              <div className="font-gaming text-4xl text-primary">{scores?.solo ?? 0}</div>
+              <div className="text-sm text-muted-foreground font-gaming mb-1">
+                SCORE
+              </div>
+              <div className="font-gaming text-4xl text-primary">
+                {scores?.solo ?? 0}
+              </div>
             </div>
           ) : (
             <>
               <div className="text-center flex-1">
-                <div className="text-sm text-primary font-gaming mb-1">PLAYER 1</div>
-                <div className="font-gaming text-4xl text-foreground">{scores?.player1 ?? 0}</div>
+                <div className="text-sm text-primary font-gaming mb-1">
+                  PLAYER 1
+                </div>
+                <div className="font-gaming text-4xl text-foreground">
+                  {scores?.player1 ?? 0}
+                </div>
               </div>
-              <div className="font-gaming text-2xl text-muted-foreground">VS</div>
+              <div className="font-gaming text-2xl text-muted-foreground">
+                VS
+              </div>
               <div className="text-center flex-1">
-                <div className="text-sm text-accent font-gaming mb-1">PLAYER 2</div>
-                <div className="font-gaming text-4xl text-foreground">{scores?.player2 ?? 0}</div>
+                <div className="text-sm text-accent font-gaming mb-1">
+                  PLAYER 2
+                </div>
+                <div className="font-gaming text-4xl text-foreground">
+                  {scores?.player2 ?? 0}
+                </div>
               </div>
             </>
           )}
         </div>
+      </div>
+      {/* Controls */}
+      <div className="flex justify-center gap-2 mx-auto mt-4">
+        {!isPlaying || isPaused ? (
+          <NeonButton variant="primary" size="sm" onClick={onPlay} className="rounded-xl">
+            <Play className="w-4 h-4 mr-1 " /> PLAY
+          </NeonButton>
+        ) : (
+          <NeonButton variant="ghost" size="sm" className="rounded-xl" onClick={onPause}>
+            <Pause className="w-4 h-4 mr-1" /> PAUSE
+          </NeonButton>
+        )}
+        <NeonButton variant="ghost" size="sm" className="rounded-xl" onClick={onRestart}>
+          <RotateCcw className="w-4 h-4" />
+        </NeonButton>
       </div>
 
       {/* Game Over Overlay */}

@@ -12,8 +12,8 @@ const CANVAS_HEIGHT = 600;
 const BIRD_SIZE = 30;
 const PIPE_WIDTH = 60;
 const PIPE_GAP = 180;
-const GRAVITY = 0.5;
-const JUMP_FORCE = -10;
+const GRAVITY = 0.4;
+const JUMP_FORCE = -9;
 const PIPE_SPEED = 3;
 
 interface Pipe {
