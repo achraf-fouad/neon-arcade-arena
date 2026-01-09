@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
+import "./SnakeGame.css"
 
 interface SnakeGameProps {
   isPlaying: boolean;
@@ -243,29 +244,30 @@ const SnakeGame = ({
   ====================== */
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4  sm:align-center" id="snakeP">
       <canvas
         ref={canvasRef}
         width={GRID_SIZE * CELL_SIZE}
         height={GRID_SIZE * CELL_SIZE}
         className="rounded-lg border neon-border-cyan"
+        id="snakeZone"
       />
 
       {/* Mobile Controls */}
       <div className="flex flex-col items-center gap-2 md:hidden">
         <button onClick={() => changeDirection("UP")}>
-          <ArrowUp className="bg-black rounded-lg neon-border-cyan w-10"/>
+          <ArrowUp className="bg-black rounded-lg neon-border-cyan w-14 h-10 mb-5"/>
         </button>
 
         <div className="flex gap-2">
           <button onClick={() => changeDirection("LEFT")}>
-            <ArrowLeft className="bg-black rounded-lg neon-border-cyan w-10"/>
+            <ArrowLeft className="bg-black rounded-lg neon-border-cyan w-14 h-10 mr-5"/>
           </button>
           <button onClick={() => changeDirection("DOWN")}>
-            <ArrowDown className="bg-black rounded-lg neon-border-cyan w-10"/>
+            <ArrowDown className="bg-black rounded-lg neon-border-cyan w-14 h-10 "/>
           </button>
           <button onClick={() => changeDirection("RIGHT")}>
-            <ArrowRight className="bg-black rounded-lg neon-border-cyan w-10"/>
+            <ArrowRight className="bg-black rounded-lg neon-border-cyan w-14 h-10 ml-5"/>
           </button>
         </div>
       </div>

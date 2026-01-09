@@ -1,0 +1,12 @@
+@media (max-width:500px) {
+    #snakeP {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: fit-content;
+    }
+    #snakeZone {
+        width: 300px !important;
+        height: 300px !important;
+    }
+}

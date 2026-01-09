@@ -10,6 +10,7 @@ import { MemoryGame } from "@/components/games/MemoryGame";
 import { FlappyGame } from "@/components/games/FlappyGame";
 import { ReactionGame } from "@/components/games/ReactionGame";
 import { cn } from "@/lib/utils";
+import "./GamePage.css"
 
 const GamePage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -137,8 +138,8 @@ const GamePage = () => {
 
   return (
     <Layout showFooter={false}>
-      <section className="py-6 md:py-8 min-h-[calc(100vh-5rem)]">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <section className="py-6 md:py-8 min-h-[calc(100vh-5rem)] " id="gameP">
+        <div className="container mx-auto px-4 max-w-4xl ">
           {/* Mode Selector */}
           {showModeSelector && !isPlaying && (
             <div className="flex justify-center mb-6">
@@ -185,7 +186,7 @@ const GamePage = () => {
 
           {/* Game Area */}
           <div className="mt-6 flex justify-center">
-            <div className="glass-card rounded-xl p-6 md:p-8">
+            <div className="glass-card rounded-xl p-6 md:p-8 ms:ml-10">
               {renderGame()}
             </div>
           </div>
