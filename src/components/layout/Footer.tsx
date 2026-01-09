@@ -59,10 +59,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-6 border-t border-border/30 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-xs">
-            © 2026 NEON GAMES.
-          </p>
+        <div className="mt-12 pt-6 border-t border-border/30 flex flex-col md:flex-row justify-center items-center gap-4">
+          
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse" />
             Created by
