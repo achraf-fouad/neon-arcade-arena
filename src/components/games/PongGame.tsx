@@ -246,7 +246,7 @@ const PongGame = ({
             onTouchEnd={() => pressKey("w", false)}
             className="w-12 h-12 rounded-full bg-primary/20 neon-border-cyan"
           >
-            <ArrowUp className="text-primary mx-auto"/>
+            <ArrowUp className="text-primary mx-auto w-100"/>
           </button>
           <button
             onTouchStart={() => pressKey("s", true)}
