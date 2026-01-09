@@ -40,11 +40,11 @@ const GameHUD = ({
     <div className={cn("w-full", className)}>
       {/* Top Bar */}
       <div className="glass-card rounded-xl p-4 mb-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-4">
           {/* Back Button & Title */}
           <div className="flex items-center gap-4">
             <Link to="/games">
-              <NeonButton variant="ghost" size="sm">
+              <NeonButton variant="ghost" size="sm" className="rounded-xl">
                 <Home className="w-4 h-4" />
               </NeonButton>
             </Link>
