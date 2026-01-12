@@ -65,7 +65,7 @@ const Footer = () => {
             <span className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse" />
             Created by
             <a
-              href="https://achraf-fouad-portfolio.vercel.app/"
+              href="https://achraf-fouad-dev-portfolio.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="underline text-green-500 transition-colors hover:text-neon-green"
